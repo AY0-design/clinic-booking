@@ -122,10 +122,7 @@ function canonical(v) {
 //   1. advisory lock on the Idempotency-Key  -> two identical retries can't both run
 //   2. advisory lock on the email            -> rate-limit count + insert is atomic
 // The slot itself is protected by the unique index, not by a lock.
-//
-// LOOM: read this function top to bottom while you talk. It follows the order
-// of the script: idempotency (3:00), rate limit (3:45), validation (1:30),
-// then the insert that the unique index guards (2:15).
+
 async function createBooking(c, body, idemKey) {
   const bodyObj = body && typeof body === 'object' && !Array.isArray(body) ? body : {};
   const hash = crypto.createHash('sha256').update(canonical(body === undefined ? null : body)).digest('hex');
@@ -150,7 +147,7 @@ async function createBooking(c, body, idemKey) {
     return { status, json };
   };
 
-  // Level 5 (LOOM 3:45-4:10, "Rate limit")
+  
   const rawEmail = typeof bodyObj.email === 'string' ? bodyObj.email.trim().toLowerCase() : '';
   if (rawEmail) {
     await c.query('SELECT pg_advisory_xact_lock(hashtext($1))', ['rl:' + rawEmail]);
@@ -168,9 +165,7 @@ async function createBooking(c, body, idemKey) {
     await c.query('INSERT INTO attempts (email) VALUES ($1)', [rawEmail]);
   }
 
-  // Level 2 (LOOM 1:30-2:15): validation. Trim name and slot_id, lowercase the
-  // email. 400 for missing or bad input, 404 for an unknown slot, 400 if the
-  // slot has already started.
+  
   const slotId = typeof bodyObj.slot_id === 'string' ? bodyObj.slot_id.trim() : '';
   const name = typeof bodyObj.name === 'string' ? bodyObj.name.trim() : '';
   if (!slotId) return done(400, { error: 'slot_id is required' });
@@ -182,13 +177,7 @@ async function createBooking(c, body, idemKey) {
   if (!slot) return done(404, { error: 'slot not found' });
   if (new Date(slot.start_at).getTime() <= Date.now()) return done(400, { error: 'slot has already started' });
 
-  // Level 3 (LOOM 2:15-3:00, "No double booking"): the unique index decides who
-  // wins a race.
-  //   - We don't check "is it free?" first and then insert. That has a gap
-  //     between the check and the insert. We just insert and let the partial
-  //     unique index in db.js refuse the second confirmed booking (error 23505).
-  //   - The SAVEPOINT lets us roll back just the failed insert and still store
-  //     the 409 for idempotent replays in the same transaction.
+  
   await c.query('SAVEPOINT ins');
   try {
     const { rows } = await c.query(
@@ -221,10 +210,7 @@ app.post('/bookings', wrap(async (req, res) => {
   res.status(result.status).json(result.json);
 }));
 
-// ---- GET /bookings?email=&limit=&cursor= (level 4) -------------------------
-// LOOM (3:00-3:45): cursor paging, not page numbers. The cursor is the last
-// row's increasing `seq`, base64url-encoded. "Rows after seq N" stays correct
-// when new bookings arrive between pages; "page 2" would shift.
+
 app.get('/bookings', wrap(async (req, res) => {
   const email = typeof req.query.email === 'string' ? req.query.email.trim().toLowerCase() : '';
   if (!email) return res.status(400).json({ error: 'email is required' });
@@ -247,7 +233,7 @@ app.get('/bookings', wrap(async (req, res) => {
     }
   }
 
-  // Ask for one extra row to know whether another page exists.
+  
   const { rows } = await pool.query(
     `SELECT * FROM bookings WHERE email = $1 AND seq > $2 ORDER BY seq LIMIT $3`,
     [email, after, limit + 1]);

@@ -36,9 +36,6 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export const getSlots = () => call<{ slots: Slot[] }>("/slots").then((r) => r.slots);
 
-// LOOM the caller passes in the Idempotency-Key. page.tsx makes a
-// new one per booking attempt and reuses it on retries, so a double click or a
-// dropped connection can't create two bookings.
 export const createBooking = (
   input: { slot_id: string; name: string; email: string },
   idempotencyKey: string,

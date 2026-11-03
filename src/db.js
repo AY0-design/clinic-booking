@@ -10,14 +10,7 @@ const pool = new Pool({
 });
 
 // Schema. The partial unique index is what makes double-booking impossible:
-// the database itself refuses a second *confirmed* booking for the same slot,
-// no matter how many requests race.
-//
-// `one_confirmed_per_slot`): "Only rows with status
-// 'confirmed' count, so a cancelled booking doesn't block the slot." The other
-// tables support later levels: `bookings.seq` is the paging cursor (level 4),
-// `idempotency` stores replayable responses (level 4), `attempts` feeds the
-// rate limit (level 5).
+
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS slots (
   id        TEXT PRIMARY KEY,
