@@ -72,7 +72,11 @@ npm install
 npm start
 ```
 
-The tables are created on first start. Load slots with `POST /reset`.
+The tables are created on first start. Load fresh slots (the next 7 days by default) with:
+
+```bash
+API_URL=http://localhost:3000 API_KEY=your-key node scripts/seed.js [days]
+```
 
 ### Mayday booking UI
 
