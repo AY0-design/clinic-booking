@@ -190,7 +190,7 @@ export function TimeStep({ slots, loading, now, error, selectedId, onSelect, onC
                       >
                         <span className="font-medium leading-5 text-[var(--ds-text-strong)] whitespace-nowrap">{clock(new Date(s.start))}</span>
                         <span aria-hidden className="size-1 rounded-full bg-[var(--ds-text-soft)]" />
-                        <span className="truncate leading-5 text-[var(--ds-text-soft)]">{group.length > 1 ? `${group.length} spot left` : s.provider}</span>
+                        <span className="truncate leading-5 text-[var(--ds-text-soft)]">{group.length > 1 ? `${group.length} spot available` : s.provider}</span>
                       </button>
                     );
                   })}

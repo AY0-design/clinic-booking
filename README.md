@@ -47,7 +47,7 @@ Full contract: https://koyaacademy.com/assessment-api
 
 The UI in `ui/` follows the Mayday Figma design across four screens:
 
-1. **Time.** Pick a day, optionally filter by provider, then pick a time. One chip per time. It shows "N spot left" when several providers are free, or the provider's name when only one is.
+1. **Time.** Pick a day, optionally filter by provider, then pick a time. One chip per time. It shows "N spot available" when several providers are free, or the provider's name when only one is.
 2. **Details.** First name, last name and email, with inline validation.
 3. **Confirmation.** The booking summary, a copy button for the confirmation ID, **Add to calendar** (downloads an `.ics` file), **Book another**, and **Cancel booking**.
 4. **My records.** A drawer where you enter your email to see your bookings, cancel one, or load more.
