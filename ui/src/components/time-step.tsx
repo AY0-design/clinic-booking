@@ -169,7 +169,7 @@ export function TimeStep({ slots, loading, now, error, selectedId, onSelect, onC
           ) : !loading && !times.length ? (
             <p className="text-[14px] text-[var(--ds-text-soft)]">No open times right now. Please check back soon.</p>
           ) : (
-            <div key={`${activeDay}|${provider}`} className="grid min-h-[136px] grid-cols-3 content-start gap-x-3 gap-y-5" role="group" aria-label="Time">
+            <div key={`${activeDay}|${provider}`} className="grid min-h-[136px] grid-cols-2 content-start gap-x-3 gap-y-5" role="group" aria-label="Time">
               {loading
                 ? Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-8 animate-pulse rounded-[10px] bg-[var(--ds-bg-surface)]" />)
                 : times.map((group, i) => {
@@ -190,7 +190,7 @@ export function TimeStep({ slots, loading, now, error, selectedId, onSelect, onC
                       >
                         <span className="font-medium leading-5 text-[var(--ds-text-strong)] whitespace-nowrap">{clock(new Date(s.start))}</span>
                         <span aria-hidden className="size-1 rounded-full bg-[var(--ds-text-soft)]" />
-                        <span className="truncate leading-5 text-[var(--ds-text-soft)]">{group.length > 1 ? `${group.length} spot available` : s.provider}</span>
+                        <span className="leading-5 whitespace-nowrap text-[var(--ds-text-soft)]">{group.length > 1 ? `${group.length} spot available` : s.provider}</span>
                       </button>
                     );
                   })}
